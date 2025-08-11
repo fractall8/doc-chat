@@ -1,7 +1,6 @@
 import MaxWidthWrapper from "@/components/max-width-wrapper";
 import { buttonVariants } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
@@ -23,7 +22,6 @@ export default function Home() {
             className: "mt-5",
           })}
           href="/dashboard"
-          target="_blank"
         >
           Get started <ArrowRight className="ml-2 h-5 w-5" />
         </Link>
