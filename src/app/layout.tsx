@@ -2,8 +2,8 @@
 import Navbar from "@/components/navbar";
 import { cn } from "@/lib/utils";
 import { Inter } from "next/font/google";
+import Providers from "@/components/providers";
 import "./globals.css";
-import { SessionProvider } from "next-auth/react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <SessionProvider>
+    <Providers>
       <html lang="en" className="light">
         <body
           className={cn(
@@ -25,6 +25,6 @@ export default function RootLayout({
           {children}
         </body>
       </html>
-    </SessionProvider>
+    </Providers>
   );
 }
