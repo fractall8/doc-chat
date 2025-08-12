@@ -6,7 +6,7 @@ import Google from "next-auth/providers/google";
 
 const authOptions: AuthOptions = {
     adapter: PrismaAdapter(prisma),
-    secret: process.env.NEXTAUTH_SECRET!,
+    secret: process.env.NEXTAUTH_SECRET,
     pages: {
         signIn: "/auth/signin",
         verifyRequest: "/auth/verify-request",
