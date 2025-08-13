@@ -3,21 +3,25 @@ import { useDropzone } from "react-dropzone";
 import { useUploadThing } from "@/lib/uploadthing";
 import { trpc } from "@/app/_trpc/client";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/lib/react-toastify";
 
 import { Progress } from "@/components/ui/progress";
 import { Cloud, File, Loader2 } from "lucide-react";
 
 const UploadDropzone = () => {
   const router = useRouter();
+
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const { error, success } = useToast();
   const { startUpload } = useUploadThing("pdfUploader");
 
   const { mutate: startPolling } = trpc.getFile.useMutation({
     onSuccess: (file) => {
+      success(`${file.name} file successfully uploaded!`);
       router.push(`/dashboard/${file.id}`);
     },
-    retry: true,
+    retry: 3,
     retryDelay: 500,
   });
 
@@ -41,23 +45,28 @@ const UploadDropzone = () => {
     accept: {
       "application/pdf": [".pdf"],
     },
-    maxSize: 8 * 1024 * 1024, // max file size is 8 MB
     multiple: false,
     onDrop: async (acceptedFile) => {
-      setIsUploading(true);
+      if (acceptedFile[0].size > 8 * 1024 * 1024) {
+        // > 8MB
+        error("Only files up to 8 MB in size are accepted!");
+        return;
+      }
 
+      setIsUploading(true);
       const processInterval = startSimulatedProgress();
 
       const res = await startUpload(acceptedFile);
 
       if (!res) {
-        // todo: toast notification
-        console.log("Ane error occurred while file uploading");
+        error("An error occurred while file uploading");
+        clearInterval(processInterval);
+        setUploadProgress(0);
         return;
       }
 
       const [fileResponse] = res;
-      const key = fileResponse?.key;
+      const key = fileResponse?.key || "";
 
       clearInterval(processInterval);
       setUploadProgress(100);
