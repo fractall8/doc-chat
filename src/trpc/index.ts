@@ -11,6 +11,26 @@ export const appRouter = router({
         });
         return files;
     }),
+    getUserFileById: privateProcedure.input(z.object({ fileId: z.string() })).query(async ({ ctx, input }) => {
+        const file = await prisma.file.findUnique({ where: { id: input.fileId, userEmail: ctx.email } })
+        if (!file) throw new TRPCError({ code: "NOT_FOUND" });
+        return file
+    }),
+    getFile: privateProcedure
+        .input(z.object({ key: z.string() }))
+        .mutation(async ({ ctx, input }) => {
+
+            const file = await prisma.file.findFirst({
+                where: {
+                    key: input.key,
+                    userEmail: ctx.email,
+                },
+            })
+
+            if (!file) throw new TRPCError({ code: 'NOT_FOUND' })
+
+            return file
+        }),
     deleteFile: privateProcedure.input(z.object({ id: z.string() })).mutation(async ({ ctx, input }) => {
         const file = await prisma.file.findFirst({
             where: {

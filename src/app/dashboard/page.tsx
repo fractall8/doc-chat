@@ -1,12 +1,13 @@
 "use client";
 
 import { trpc } from "@/app/_trpc/client";
-import { Ghost, Loader2, MessageSquare, Plus, Trash } from "lucide-react";
+import { Ghost, Loader2, Plus, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Skeleton from "@/components/skeleton";
 import Link from "next/link";
 import { useState } from "react";
 import { formatDate } from "@/lib/utils/index";
+import UploadButton from "@/components/upload-button";
 
 const DashBoard = () => {
   const [currentlyDeletingFile, setCurrentlyDeletingFile] = useState<
@@ -29,7 +30,6 @@ const DashBoard = () => {
     },
   });
 
-  console.log("Received files:", files);
   return (
     <main className="mx-auto w-full max-w-screen-xl px-2.5 md:px-20">
       <div className="mt-8 flex flex-col items-start justify-between gap-4 border-b border-gray-200 pb-5 sm:flex-row sm:items-center sm:gap-0">
@@ -37,10 +37,9 @@ const DashBoard = () => {
           My Files
         </h1>
 
-        {/* upload button somewhere */}
+        <UploadButton />
       </div>
 
-      {/* display all user files */}
       {files && files?.length !== 0 ? (
         <ul className="mt-6 grid grid-cols-1 gap-6 divide-y divide-zinc-200 md:grid-cols-2 lg:grid-cols-3">
           {files
@@ -70,21 +69,16 @@ const DashBoard = () => {
                   </div>
                 </Link>
 
-                <div className="px-6 mt-4 grid grid-cols-3 place-items-center py-2 gap-6 text-xs text-zinc-500">
+                <div className="px-6 mt-4 flex justify-between place-items-center py-2 gap-6 text-xs text-zinc-500">
                   <div className="flex items-center gap-2">
                     <Plus className="h-4 w-4" />
                     {formatDate(new Date(file.createdAt))}
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <MessageSquare className="h-4 w-4" />
-                    mocked
-                  </div>
-
                   <Button
                     onClick={() => deleteFile({ id: file.id })}
                     size="sm"
-                    className="w-full"
+                    className="!px-8"
                     variant="destructive"
                   >
                     {currentlyDeletingFile === file.id ? (

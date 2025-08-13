@@ -53,7 +53,7 @@ enum UploadStatus {
 }
 
 model File {
-  id   String @unique
+  id   String @unique @default(cuid())
   name String
 
   uploadStatus UploadStatus

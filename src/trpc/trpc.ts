@@ -9,8 +9,6 @@ const isAuth = t.middleware(async ({ ctx, next }) => {
 
     if (!session || !session.user) throw new TRPCError({ code: "UNAUTHORIZED" })
 
-    console.log("context:", ctx)
-
     return next({
         ctx: {
             ...ctx,
