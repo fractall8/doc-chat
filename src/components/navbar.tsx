@@ -22,9 +22,14 @@ const Navbar = () => {
           <div className="hidden items-center space-x-4 sm:flex">
             {/* {todo: create links for dashboard and auth} */}
             {session?.user ? (
-              <Button onClick={() => signOut({ callbackUrl: "/" })}>
-                Log out <LogOut />
-              </Button>
+              <>
+                <Link href="/dashboard">
+                  <Button variant={"link"}>Dashboard</Button>
+                </Link>
+                <Button onClick={() => signOut({ callbackUrl: "/" })}>
+                  Log out <LogOut />
+                </Button>
+              </>
             ) : (
               <Button onClick={() => router.push("/auth/signin")}>
                 Sing in
