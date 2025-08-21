@@ -1,5 +1,5 @@
 import prisma from '@/lib/prisma';
-import { z } from "zod"
+import { file, z } from "zod"
 import { privateProcedure, router } from './trpc';
 import { TRPCError } from '@trpc/server';
 
@@ -31,6 +31,14 @@ export const appRouter = router({
 
             return file
         }),
+
+    getFileUploadStatus: privateProcedure.input(z.object({ fileId: z.string() })).query(async ({ input, ctx }) => {
+        const file = await prisma.file.findUnique({ where: { id: input.fileId, userEmail: ctx.user.email } })
+
+        if (!file) return { status: "PENDING" as const }
+
+        return { status: file.uploadStatus }
+    }),
     deleteFile: privateProcedure.input(z.object({ id: z.string() })).mutation(async ({ ctx, input }) => {
         const file = await prisma.file.findFirst({
             where: {

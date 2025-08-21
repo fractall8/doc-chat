@@ -5,6 +5,7 @@ import { trpc } from "@/app/_trpc/client";
 import { notFound } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
+import ChatWrapper from "@/components/chat/chat-wrapper";
 
 const PdfRenderer = dynamic(() => import("@/components/pdf-renderer"), {
   ssr: false,
@@ -42,7 +43,7 @@ const FileIdPage = ({ params }: FileIdPageProps) => {
         </div>
 
         <div className="shrink-0 flex-[0.75] border-t border-gray-200 lg:w-96 lg:border-l lg:border-t-0">
-          <div>Chat</div>
+          <ChatWrapper fileId={fileId} />
         </div>
       </div>
     </div>
