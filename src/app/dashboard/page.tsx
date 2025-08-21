@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { formatDate } from "@/lib/utils/index";
 import UploadButton from "@/components/upload-button";
+import { useToast } from "@/lib/react-toastify";
 
 const DashBoard = () => {
   const [currentlyDeletingFile, setCurrentlyDeletingFile] = useState<
@@ -17,16 +18,21 @@ const DashBoard = () => {
   const utils = trpc.useUtils();
 
   const { data: files, isLoading } = trpc.getUserFiles.useQuery();
+  const { success, error } = useToast();
 
   const { mutate: deleteFile } = trpc.deleteFile.useMutation({
-    onSuccess: () => {
+    onSuccess: ({ file }) => {
       utils.getUserFiles.invalidate();
+      success(`${file.name} successfully deleted!`);
     },
     onMutate({ id }) {
       setCurrentlyDeletingFile(id);
     },
     onSettled() {
       setCurrentlyDeletingFile(null);
+    },
+    onError: (e) => {
+      error(e.message);
     },
   });
 

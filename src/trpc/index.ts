@@ -1,7 +1,8 @@
 import prisma from '@/lib/prisma';
-import { file, z } from "zod"
+import { z } from "zod";
 import { privateProcedure, router } from './trpc';
 import { TRPCError } from '@trpc/server';
+import { UTApi } from 'uploadthing/server';
 
 
 export const appRouter = router({
@@ -49,13 +50,23 @@ export const appRouter = router({
 
         if (!file) throw new TRPCError({ code: "NOT_FOUND" });
 
+        // delete file from uploadthing
+        const utapi = new UTApi({
+            token: process.env.UPLOADTHING_TOKEN,
+            defaultKeyType: "fileKey"
+        });
+
+        const response = await utapi.deleteFiles(file.key)
+
+        // delete index from pinecone
+
         await prisma.file.delete({
             where: {
                 id: input.id
             }
         })
 
-        return file
+        return { file, success: response.success }
     })
 });
 
