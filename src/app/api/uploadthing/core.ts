@@ -4,8 +4,8 @@ import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
 import { WebPDFLoader } from "@langchain/community/document_loaders/web/pdf";
 import { PineconeStore } from "@langchain/pinecone";
-import { pinecone } from "@/lib/pinecone";
-import { getHuggingFaceEmbeddings } from "@/lib/huggingface";
+import { pineconeIndex } from "@/lib/pinecone";
+import { HuggingFaceInferenceEmbeddings } from "@langchain/community/embeddings/hf";
 
 const f = createUploadthing();
 
@@ -44,23 +44,14 @@ export const ourFileRouter = {
 
                 if (!pageLevelDocs.length) throw new Error("PDF is empty");
 
-                // texts from pdf for generating embeddings
-                const texts = pageLevelDocs.map(doc => doc.pageContent);
+                const embeddings = new HuggingFaceInferenceEmbeddings({
+                    apiKey: process.env.HF_TOKEN,
+                    model: "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
+                });
 
-                const embeddingsArray = await getHuggingFaceEmbeddings(texts);
-
-                console.log(`Embeddings: ${embeddingsArray.length} pts.`);
 
                 // vectorize and index in Pinecone
-                const pineconeIndex = pinecone.index("doc-chat");
-
-                await PineconeStore.fromDocuments(pageLevelDocs, {
-                    embedDocuments: async () => embeddingsArray,
-                    embedQuery: async (query: string) => {
-                        const [vec] = await getHuggingFaceEmbeddings([query]);
-                        return vec;
-                    },
-                }, {
+                await PineconeStore.fromDocuments(pageLevelDocs, embeddings, {
                     pineconeIndex,
                     namespace: createdFile.id,
                 });

@@ -1,3 +1,4 @@
+
 export function formatDate(date: Date) {
     const year = date.getFullYear();
     const monthRecord: Record<number, string> = {
